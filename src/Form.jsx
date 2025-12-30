@@ -1,6 +1,6 @@
 import { useState } from "react";
 import clsx from "clsx";
-import { Supabse } from "./subabase/supabase";
+import { Supabase } from "./subabase/supabase";
 
 const Form = ({ open, setOpen }) => {
   const [name, setName] = useState("");
@@ -10,7 +10,7 @@ const Form = ({ open, setOpen }) => {
   const handleSave = async () => {
     if (name !== "" && email !== "" && phone !== "") {
       try {
-        const { error } = await Supabse.from("waitlist").insert([
+        const { error } = await Supabase.from("waitlist").insert([
           {
             name: name.trim(),
             email: email.trim(),
@@ -51,7 +51,7 @@ const Form = ({ open, setOpen }) => {
           open ? "block z-40" : "hidden"
         )}
       >
-        <div className="flex flex-col gap-5 bg-gray-400 py-20 px-10 rounded-xl">
+        <div className="flex flex-col gap-5 bg-gray-400 py-20 max-md:ml-1 max-md:mr-1 px-10 rounded-xl">
           <input
             type="text"
             placeholder="Name"

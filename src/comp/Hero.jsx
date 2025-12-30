@@ -21,7 +21,7 @@ const Hero = () => {
                 for students who demand more.
               </p>
               <Button onClick={()=>setOpen(true)}>Join Waitlist</Button>
-              <div className="flex flex-row-reverse gap-10 max-lg:flex-col pt-20 max-md:pt-10">
+              <div className="flex flex-row-reverse gap-10 max-lg:flex-col pt-20 max-md:pt-10 ">
                 <img
                   src="/logo/mock1.png"
                   width={640}
