@@ -38,7 +38,7 @@ const Hero = () => {
             </div>
           </div>
           {open && (
-                  <div className='fixed top-50 inset-0 '>
+                  <div className='fixed top-20 z-50 inset-0 '>
                     <Form open={open} setOpen={setOpen}/>
                   </div>
                 )}
