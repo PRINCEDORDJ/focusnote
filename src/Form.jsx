@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import clsx from "clsx";
 import { Supabase } from "./subabase/supabase";
 
@@ -14,6 +14,18 @@ const Form = ({ open, setOpen }) => {
   const [coreProblems, setCoreProblems] = useState([]);
   const [coreProblemsOther, setCoreProblemsOther] = useState("");
   const [whenStuck, setWhenStuck] = useState("");
+
+  // popup state for non-blocking alerts/confirmations
+  const [popup, setPopup] = useState({ visible: false, message: "" });
+  const popupTimer = useRef();
+
+  const showPopup = (message, ms = 3000) => {
+    clearTimeout(popupTimer.current);
+    setPopup({ visible: true, message });
+    popupTimer.current = setTimeout(() => {
+      setPopup({ visible: false, message: "" });
+    }, ms);
+  };
 
   const [currentSolutions, setCurrentSolutions] = useState([]);
   const [currentSolutionsOther, setCurrentSolutionsOther] = useState("");
@@ -32,7 +44,9 @@ const Form = ({ open, setOpen }) => {
       setFn(arr.filter((a) => a !== value));
     } else {
       if (limit && arr.length >= limit) {
-        alert(`Please select up to ${limit} option${limit > 1 ? "s" : ""}.`);
+        showPopup(
+          `Please select up to ${limit} option${limit > 1 ? "s" : ""}.`
+        );
         return;
       }
       setFn([...arr, value]);
@@ -50,13 +64,13 @@ const Form = ({ open, setOpen }) => {
             // survey fields saved as simple strings / JSON
             role: role,
             studying: studying,
-            core_problems: JSON.stringify(coreProblems),
+            core_problems: coreProblems,
             core_problems_other: coreProblemsOther,
             when_stuck: whenStuck,
-            current_solutions: JSON.stringify(currentSolutions),
+            current_solutions: currentSolutions,
             current_solutions_other: currentSolutionsOther,
             dislike_current: dislikeCurrent,
-            features: JSON.stringify(features),
+            features: features,
             features_other: featuresOther,
             usage_frequency: usageFrequency,
             willing_to_pay: willingToPay,
@@ -66,7 +80,7 @@ const Form = ({ open, setOpen }) => {
 
         if (error) {
           console.error("Error saving to Supabase:", error.message);
-          alert("Failed to save. Please try again.");
+          showPopup("Failed to save. Please try again.");
         } else {
           // Clear form and close modal on success
           setName("");
@@ -89,14 +103,14 @@ const Form = ({ open, setOpen }) => {
           setEarlyAccess("");
 
           setOpen(false);
-          alert("Thank you! You have been added to the waitlist.");
+          showPopup("Thank you! You have been added to the waitlist.");
         }
       } catch (err) {
         console.error("Unexpected error:", err);
-        alert("An unexpected error occurred. Please try again.");
+        showPopup("An unexpected error occurred. Please try again.");
       }
     } else {
-      alert("Please fill in Name, Email, and Phone.");
+      showPopup("Please fill in Name, Email, and Phone.");
     }
   };
 
@@ -127,6 +141,19 @@ const Form = ({ open, setOpen }) => {
         className={clsx("modal-backdrop", open ? "block" : "hidden")}
         onClick={() => setOpen(false)}
       />
+
+      {/* Popup for confirmations/alerts (replaces window.alert) */}
+      <div
+        className={clsx(
+          "fixed left-1/2 transform -translate-x-1/2 top-6 z-50 transition-opacity",
+          popup.visible ? "opacity-100" : "opacity-0 pointer-events-none"
+        )}
+        aria-live="polite"
+      >
+        <div className="bg-black text-white px-4 py-2 rounded-md shadow-md">
+          {popup.message}
+        </div>
+      </div>
 
       <div
         className={clsx(
